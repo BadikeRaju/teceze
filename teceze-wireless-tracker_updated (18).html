@@ -3239,7 +3239,15 @@
         chatHistory.push({ role: 'model', parts: [{ text: response }] });
       } catch (e) {
         typing.style.display = 'none';
-        appendChatMsg('Sorry, I encountered an error. Please check your API key and try again.', 'bot');
+        let errorMsg = 'Sorry, I encountered an error. Please try again.';
+        if (e.message && e.message.includes('503')) {
+          errorMsg = 'Google servers are currently overloaded (503). Please wait a moment and try again!';
+        } else if (e.message && e.message.includes('400')) {
+          errorMsg = 'Invalid request. Please check your API key.';
+        } else if (e.message) {
+          errorMsg = `Error: ${e.message}. Please try again.`;
+        }
+        appendChatMsg(errorMsg, 'bot');
         console.error(e);
       }
     }
