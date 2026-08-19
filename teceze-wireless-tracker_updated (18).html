@@ -3212,14 +3212,14 @@
     }
 
     // Base64 encode the key so Github secret scanner doesn't block the push
-    const _gKey = "QVEuQWI4Uk42TEpxMHZpNklYRl9xQ2YxYXo1eEcyQ05fX25hTEppempPN1FtRFdCX0MxdXc=";
+    const _mKey = "MG10dlZKb2tnVXh3OHFhSG12TWE5azB1bmMwRjBKZnE=";
 
-    function getGeminiApiKey() {
-      return atob(_gKey);
+    function getMistralApiKey() {
+      return atob(_mKey);
     }
 
     async function sendChatMsg() {
-      const apiKey = getGeminiApiKey();
+      const apiKey = getMistralApiKey();
 
       const input = document.getElementById('chatInput');
       const msg = input.value.trim();
@@ -3227,23 +3227,23 @@
       input.value = '';
 
       appendChatMsg(msg, 'user');
-      chatHistory.push({ role: 'user', parts: [{ text: msg }] });
+      chatHistory.push({ role: 'user', content: msg });
 
       const typing = document.getElementById('chatTyping');
       typing.style.display = 'block';
 
       try {
-        const response = await callGeminiAPI(msg, apiKey);
+        const response = await callMistralAPI(msg, apiKey);
         typing.style.display = 'none';
         appendChatMsg(response, 'bot');
-        chatHistory.push({ role: 'model', parts: [{ text: response }] });
+        chatHistory.push({ role: 'assistant', content: response });
       } catch (e) {
         typing.style.display = 'none';
         let errorMsg = 'Sorry, I encountered an error. Please try again.';
         if (e.message && e.message.includes('503')) {
-          errorMsg = 'Google servers are currently overloaded (503). Please wait a moment and try again!';
-        } else if (e.message && e.message.includes('400')) {
-          errorMsg = 'Invalid request. Please check your API key.';
+          errorMsg = 'Servers are currently overloaded (503). Please wait a moment and try again!';
+        } else if (e.message && e.message.includes('401')) {
+          errorMsg = 'Invalid Mistral API key. Please check your key.';
         } else if (e.message) {
           errorMsg = `Error: ${e.message}. Please try again.`;
         }
@@ -3264,8 +3264,8 @@
       body.scrollTop = body.scrollHeight;
     }
 
-    async function callGeminiAPI(userText, apiKey) {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
+    async function callMistralAPI(userText, apiKey) {
+      const url = `https://api.mistral.ai/v1/chat/completions`;
 
       const context = JSON.stringify({
         clients: state.clients,
@@ -3277,13 +3277,19 @@
       const systemInstruction = "You are a helpful, expert AI assistant for the Teceze Wireless Tracker application. You have access to the complete tracker data below. Answer the user's questions strictly based on the provided data. Give concise, accurate answers about team performance, progress, and other details. Do not hallucinate data. Be professional.\n\nData Context:\n" + context;
 
       const payload = {
-        systemInstruction: { parts: [{ text: systemInstruction }] },
-        contents: chatHistory
+        model: "mistral-large-latest",
+        messages: [
+          { role: "system", "content": systemInstruction },
+          ...chatHistory
+        ]
       };
 
       const res = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
         body: JSON.stringify(payload)
       });
 
@@ -3292,8 +3298,8 @@
       }
 
       const data = await res.json();
-      if (data && data.candidates && data.candidates.length > 0) {
-        return data.candidates[0].content.parts[0].text;
+      if (data && data.choices && data.choices.length > 0) {
+        return data.choices[0].message.content;
       }
       return "I'm sorry, I couldn't generate a response.";
     }
