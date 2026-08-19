@@ -373,6 +373,27 @@ input[type=file]{display:none;}
 .sync-badge .dot{width:8px;height:8px;border-radius:50%;background:var(--muted-2);}
 .sync-badge.on{color:var(--green);border-color:var(--green-dim);}
 .sync-badge.on .dot{background:var(--green);box-shadow:0 0 6px rgba(74,222,128,.7);animation:pulse 1.4s ease-in-out infinite;}
+
+/* ---------- Chatbot ---------- */
+.chat-window { position: fixed; right: 22px; bottom: 80px; width: 340px; height: 500px; background: linear-gradient(180deg,var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 30px 80px -20px rgba(0,0,0,.6); display: flex; flex-direction: column; z-index: 50; transform: translateY(20px); opacity: 0; pointer-events: none; transition: all .3s; }
+.chat-window.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
+.chat-head { padding: 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(17,27,46,.7); border-radius: 16px 16px 0 0; }
+.chat-title { font-family: var(--font-display); font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+.chat-title .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 6px rgba(47,217,204,.7); animation: pulse 1.4s infinite; }
+.chat-body { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+.chat-msg { max-width: 85%; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; line-height: 1.4; }
+.chat-msg.user { align-self: flex-end; background: var(--surface-3); border: 1px solid var(--border); color: var(--text); border-bottom-right-radius: 4px; }
+.chat-msg.bot { align-self: flex-start; background: var(--cyan-dim); border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 4px; }
+.chat-msg.bot p { margin-bottom: 8px; }
+.chat-msg.bot p:last-child { margin-bottom: 0; }
+.chat-msg.bot ul, .chat-msg.bot ol { margin-left: 20px; margin-bottom: 8px; }
+.chat-input-area { padding: 14px; border-top: 1px solid var(--border); display: flex; gap: 8px; background: var(--bg); border-radius: 0 0 16px 16px; }
+.chat-input-area input { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 10px 14px; color: var(--text); font-size: 13.5px; outline: none; transition: border-color .2s; }
+.chat-input-area input:focus { border-color: var(--cyan); }
+.chat-send-btn { background: var(--cyan); color: #062421; border: none; border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform .15s; font-weight: 700; font-size: 16px; }
+.chat-send-btn:hover { transform: scale(1.05); }
+.chat-send-btn:active { transform: scale(.95); }
+.chat-typing { font-size: 12px; color: var(--muted); align-self: flex-start; padding: 0 10px; display: none; }
 </style>
 </head>
 <body>
@@ -437,8 +458,25 @@ input[type=file]{display:none;}
 
 <!-- ===================== CORNER BUTTONS ===================== -->
 <div class="corner-stack" id="screenAppCorners" style="display:none;">
+  <button class="fab" style="border-color:var(--cyan);background:var(--surface-3);" onclick="toggleChatbot()"><span class="dot" style="background:var(--cyan)"></span>AI Assistant</button>
   <button class="fab" onclick="openKBA()"><span class="dot"></span>KBA</button>
   <button class="fab fab-amber" onclick="openChecklist()"><span class="dot"></span>Prechecklist</button>
+</div>
+
+<!-- ===================== CHATBOT WINDOW ===================== -->
+<div class="chat-window" id="chatWindow">
+  <div class="chat-head">
+    <div class="chat-title"><span class="dot"></span> AI Assistant</div>
+    <button class="modal-close" onclick="toggleChatbot()">✕</button>
+  </div>
+  <div class="chat-body" id="chatBody">
+    <div class="chat-msg bot">Hi! I'm your Teceze AI Assistant. Ask me anything about team performance, progress, and tasks.</div>
+    <div class="chat-typing" id="chatTyping">AI is thinking...</div>
+  </div>
+  <div class="chat-input-area">
+    <input type="text" id="chatInput" placeholder="Ask a question..." onkeypress="if(event.key === 'Enter') sendChatMsg()">
+    <button class="chat-send-btn" onclick="sendChatMsg()">↑</button>
+  </div>
 </div>
 
 <!-- ===================== OTHERS MODAL ===================== -->
@@ -1742,6 +1780,101 @@ async function writeLiveSyncFile(){
 }
 
 /* ===================== INIT ===================== */
+/* ===================== CHATBOT LOGIC ===================== */
+let chatHistory = [];
+
+function toggleChatbot() {
+  const cw = document.getElementById('chatWindow');
+  cw.classList.toggle('show');
+}
+
+function getGeminiApiKey() {
+  let key = localStorage.getItem('geminiApiKey');
+  if (!key) {
+    key = prompt("Please enter your Gemini API Key to use the AI Assistant:");
+    if (key) {
+      localStorage.setItem('geminiApiKey', key);
+    }
+  }
+  return key;
+}
+
+async function sendChatMsg() {
+  const apiKey = getGeminiApiKey();
+  if (!apiKey) {
+    alert("An API key is required to use the chatbot.");
+    return;
+  }
+
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if(!msg) return;
+  input.value = '';
+
+  appendChatMsg(msg, 'user');
+  chatHistory.push({ role: 'user', parts: [{ text: msg }] });
+
+  const typing = document.getElementById('chatTyping');
+  typing.style.display = 'block';
+
+  try {
+    const response = await callGeminiAPI(msg, apiKey);
+    typing.style.display = 'none';
+    appendChatMsg(response, 'bot');
+    chatHistory.push({ role: 'model', parts: [{ text: response }] });
+  } catch(e) {
+    typing.style.display = 'none';
+    appendChatMsg('Sorry, I encountered an error. Please check your API key and try again.', 'bot');
+    console.error(e);
+  }
+}
+
+function appendChatMsg(text, sender) {
+  const body = document.getElementById('chatBody');
+  const typing = document.getElementById('chatTyping');
+  const div = document.createElement('div');
+  div.className = `chat-msg ${sender}`;
+  let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+  formattedText = formattedText.replace(/\n/g, '<br>');
+  div.innerHTML = formattedText;
+  body.insertBefore(div, typing);
+  body.scrollTop = body.scrollHeight;
+}
+
+async function callGeminiAPI(userText, apiKey) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  
+  const context = JSON.stringify({
+    clients: state.clients,
+    activities: state.activities,
+    agenda: state.agenda,
+    pipeline: state.pipeline
+  });
+
+  const systemInstruction = "You are a helpful, expert AI assistant for the Teceze Wireless Tracker application. You have access to the complete tracker data below. Answer the user's questions strictly based on the provided data. Give concise, accurate answers about team performance, progress, and other details. Do not hallucinate data. Be professional.\n\nData Context:\n" + context;
+
+  const payload = {
+    systemInstruction: { parts: [{ text: systemInstruction }] },
+    contents: chatHistory
+  };
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  if(!res.ok) {
+    throw new Error('API Error: ' + res.status);
+  }
+
+  const data = await res.json();
+  if(data && data.candidates && data.candidates.length > 0) {
+    return data.candidates[0].content.parts[0].text;
+  }
+  return "I'm sorry, I couldn't generate a response.";
+}
+
 (async function init(){
   await loadState();
 })();
