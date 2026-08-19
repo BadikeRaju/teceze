@@ -3257,8 +3257,17 @@
       const typing = document.getElementById('chatTyping');
       const div = document.createElement('div');
       div.className = `chat-msg ${sender}`;
-      let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+      
+      let formattedText = text;
+      // Bold text
+      formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+      // Convert markdown headers to bold if they sneak through
+      formattedText = formattedText.replace(/^#{1,6}\s*(.*?)$/gm, '<b>$1</b>');
+      // Convert asterisks/dashes at the start of a line to bullet symbols
+      formattedText = formattedText.replace(/^[-*]\s+/gm, '• ');
+      // Replace newlines with breaks
       formattedText = formattedText.replace(/\n/g, '<br>');
+      
       div.innerHTML = formattedText;
       body.insertBefore(div, typing);
       body.scrollTop = body.scrollHeight;
@@ -3274,7 +3283,7 @@
         pipeline: state.pipeline
       });
 
-      const systemInstruction = "You are a helpful, expert AI assistant for the Teceze Wireless Tracker application. You have access to the complete tracker data below. Answer the user's questions strictly based on the provided data. Give concise, accurate answers about team performance, progress, and other details. Do not hallucinate data. Be professional.\n\nData Context:\n" + context;
+      const systemInstruction = "You are a helpful, expert AI assistant for the Teceze Wireless Tracker application. You have access to the complete tracker data below. Answer the user's questions strictly based on the provided data. Give concise, accurate answers about team performance, progress, and other details. Do not hallucinate data. Be professional.\n\nCRITICAL FORMATTING RULES:\n1. Do NOT output markdown tables (they cannot be visualized correctly in this chat window).\n2. Use a point-based structure for readability.\n3. Do NOT use markdown headers like '###'.\n4. For bullet points, do NOT use '*' or '-'. You MUST use the actual bullet symbol '•' for all list items.\n\nData Context:\n" + context;
 
       const payload = {
         model: "mistral-large-latest",
