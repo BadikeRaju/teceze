@@ -1,0 +1,24 @@
+{
+  "name": "teceze",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BadikeRaju/teceze.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/BadikeRaju/teceze/issues"
+  },
+  "homepage": "https://github.com/BadikeRaju/teceze#readme",
+  "dependencies": {
+    "mongodb": "^7.5.0"
+  }
+}

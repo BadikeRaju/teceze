@@ -2089,9 +2089,9 @@
     /* ===================== PERSISTENCE ===================== */
     async function loadState() {
       try {
-        const value = localStorage.getItem(STORAGE_KEY);
-        if (value) {
-          const parsed = JSON.parse(value);
+        const response = await fetch('/api/state');
+        if (response.ok) {
+          const parsed = await response.json();
           if (parsed && parsed.clients && parsed.activities) {
             if (!parsed.pipeline) parsed.pipeline = state.pipeline;
             if (!parsed.kba) parsed.kba = state.kba;
@@ -2106,12 +2106,18 @@
             CHECKLIST_CATEGORIES.forEach(cat => { if (!parsed.checklist[cat]) parsed.checklist[cat] = []; });
             state = parsed;
           }
+        } else {
+          console.warn('Failed to fetch from MongoDB API, falling back to local defaults');
         }
-      } catch (e) { /* first run - no data yet, keep defaults */ }
+      } catch (e) { console.error('Error loading state from API:', e); }
     }
     async function saveState(skipLiveWrite) {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        await fetch('/api/state', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(state)
+        });
       } catch (e) { console.error('Storage save failed', e); }
       if (!skipLiveWrite && typeof liveSyncHandle !== 'undefined' && liveSyncHandle) {
         writeLiveSyncFile();
