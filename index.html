@@ -1902,6 +1902,10 @@
       <div class="chat-typing" id="chatTyping">AI is thinking...</div>
     </div>
     <div class="chat-input-area">
+      <label class="icon-btn" style="cursor:pointer; margin-right:5px; font-size:18px;" title="Upload Document">
+        📎
+        <input type="file" id="chatFileInput" accept=".pdf,.docx,.txt" style="display:none;" onchange="handleChatFileUpload(event)">
+      </label>
       <input type="text" id="chatInput" placeholder="Ask a question..."
         onkeypress="if(event.key === 'Enter') sendChatMsg()">
       <button class="chat-send-btn" onclick="sendChatMsg()">↑</button>
@@ -2151,6 +2155,15 @@
         err.style.color = 'var(--bad)';
         err.textContent = 'Enter both username and password.'; 
         return; 
+      }
+      
+      if (loginMode === 'signup') {
+        const strongRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!strongRegex.test(p)) {
+          err.style.color = 'var(--bad)';
+          err.textContent = 'Password must be at least 8 chars long and include an uppercase letter, lowercase letter, number, and special character.'; 
+          return;
+        }
       }
       
       err.style.color = 'var(--text)';
@@ -2861,6 +2874,34 @@
       </div>
     `;
       }
+    }
+    
+    function handleChatFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const chatBody = document.getElementById('chatBody');
+      const typingEl = document.getElementById('chatTyping');
+      
+      const fileMsg = document.createElement('div');
+      fileMsg.className = 'chat-msg user';
+      fileMsg.textContent = `📎 Uploaded: ${file.name}`;
+      
+      chatBody.insertBefore(fileMsg, typingEl);
+      chatBody.scrollTop = chatBody.scrollHeight;
+      
+      typingEl.style.display = 'block';
+      
+      setTimeout(() => {
+        typingEl.style.display = 'none';
+        const botMsg = document.createElement('div');
+        botMsg.className = 'chat-msg bot';
+        botMsg.textContent = `I have received "${file.name}". How can I help you with this document?`;
+        chatBody.insertBefore(botMsg, typingEl);
+        chatBody.scrollTop = chatBody.scrollHeight;
+      }, 1000);
+      
+      // Reset input
+      event.target.value = '';
     }
 
     /* ---- KBA MODAL ---- */
