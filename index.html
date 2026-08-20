@@ -1987,93 +1987,13 @@
     const STORAGE_KEY = 'teceze-wireless-tracker-v1';
 
     let state = {
-      clients: {
-        "HCL": ['Pepsico', 'Abbvie', 'Kenvue', 'JNJ'],
-        "Infosys": ['PR', 'Reckitt'],
-        "BDB": ['BDB Site']
-      },
-      activities: [
-        { id: 'imp1', client: 'HCL', subclient: 'Pepsico', activity: 'USAM - 1346', status: 'Completed', engineer: 'Rajat Pathak', reportShared: 'Shared', date: '2026-01-24', notes: '1520 WILLIS RD, NORTH CHESTERFIELD, USAM', reviewedBy: 'Rajat' },
-        { id: 'imp2', client: 'HCL', subclient: 'Pepsico', activity: 'USAM - 1370', status: 'Completed', engineer: 'Damion mark & Sricharan', reportShared: 'Shared', date: '2026-02-26', notes: 'MIDDLETOWN, NY, USA, USAM', reviewedBy: 'Rajat' },
-        { id: 'imp3', client: 'HCL', subclient: 'Pepsico', activity: 'POLA - 11', status: 'Completed', engineer: 'Raj kumar & Damion mark', reportShared: 'Shared', date: '2026-03-02', notes: 'GRODZISK, Poland, EMEA', reviewedBy: 'Rajat' },
-        { id: 'imp4', client: 'HCL', subclient: 'Pepsico', activity: 'CHIN - 062', status: 'Completed', engineer: 'Damion mark', reportShared: 'Shared', date: '2026-09-03', notes: 'SHANGHAI, China, APAC', reviewedBy: 'Rajat' },
-        { id: 'imp5', client: 'HCL', subclient: 'Pepsico', activity: 'SERB - 009', status: 'Completed', engineer: 'Damion mark', reportShared: 'Shared', date: '2026-03-17', notes: 'JEDINSTVA, Serbia, EMEA', reviewedBy: 'Rajat' },
-        { id: 'imp6', client: 'HCL', subclient: 'Pepsico', activity: 'USAM - 1384', status: 'Completed', engineer: 'Sanjeevan Aloysius', reportShared: 'Shared', date: '2026-02-27', notes: 'EDGERTON, USA, USAM', reviewedBy: 'Rajat' },
-        { id: 'imp7', client: 'HCL', subclient: 'Pepsico', activity: 'THAI - 002', status: 'Completed', engineer: 'Sanjeevan Aloysius', reportShared: 'Shared', date: '2026-10-03', notes: 'UMONG, THAILAND, APAC', reviewedBy: 'Rajat' },
-        { id: 'imp8', client: 'HCL', subclient: 'Pepsico', activity: 'POLA - 47', status: 'Completed', engineer: 'Sanjeevan Aloysius', reportShared: 'Shared', date: '2026-07-04', notes: 'TOMASZOW, POLAND, EMEA', reviewedBy: 'Rajat' },
-        { id: 'imp9', client: 'HCL', subclient: 'Pepsico', activity: 'USAM - 120', status: 'Completed', engineer: 'Rajat Pathak', reportShared: 'Shared', date: '2026-02-17', notes: 'BAKERSFIELD, USAM', reviewedBy: 'Rajat' },
-        { id: 'imp10', client: 'HCL', subclient: 'Pepsico', activity: 'USAM - 1485', status: 'Completed', engineer: 'Rajat Pathak', reportShared: 'Shared', date: '2026-10-02', notes: 'BLUE SPRINGS, USAM', reviewedBy: 'Rajat' },
-        { id: 'imp11', client: 'HCL', subclient: 'Pepsico', activity: 'USAM-707', status: 'Completed', engineer: 'Sricharan', reportShared: 'Shared', date: '2026-02-23', notes: 'UNITED STATES, PBNA', reviewedBy: 'Rajat' },
-        { id: 'imp12', client: 'HCL', subclient: 'Pepsico', activity: 'USAM-389', status: 'Completed', engineer: 'Sricharan', reportShared: 'Shared', date: '2026-02-17', notes: 'UNITED STATES, PFNA', reviewedBy: 'Rajat' },
-        { id: 'imp13', client: 'HCL', subclient: 'Pepsico', activity: 'INDI-248', status: 'Completed', engineer: 'Sricharan', reportShared: 'Shared', date: '2026-02-19', notes: 'INDIA, APAC', reviewedBy: 'Rajat' },
-        { id: 'imp14', client: 'HCL', subclient: 'Pepsico', activity: 'THAI-037', status: 'Completed', engineer: 'Sricharan', reportShared: 'Shared', date: '2026-02-20', notes: 'THAILAND, APAC', reviewedBy: 'Rajat' },
-        { id: 'imp15', client: 'HCL', subclient: 'Pepsico', activity: 'SAFR-026', status: 'Completed', engineer: 'sricharan', reportShared: 'Shared', date: '2026-02-24', notes: 'SOUTH AFRICA, EMEA', reviewedBy: 'Rajat' },
-        { id: 'imp16', client: 'HCL', subclient: 'Pepsico', activity: 'KYRG-001', status: 'Completed', engineer: 'sricharan', reportShared: 'Shared', date: '2026-06-03', notes: 'KYRGYZSTAN, Europe', reviewedBy: 'Rajat' },
-        { id: 'imp17', client: 'HCL', subclient: 'Pepsico', activity: 'USAM-809', status: 'Completed', engineer: 'sricharan', reportShared: 'Shared', date: '2026-12-03', notes: 'UNITED STATES, USAM', reviewedBy: 'Rajat' },
-        { id: 'imp18', client: 'HCL', subclient: 'Pepsico', activity: 'Pola - 61', status: 'Completed', engineer: 'sricharan', reportShared: 'Shared', date: '2026-03-16', notes: 'POLAND, EMEA', reviewedBy: 'Rajat' },
-        { id: 'imp19', client: 'HCL', subclient: 'Pepsico', activity: 'EGYP- 108', status: 'Completed', engineer: 'Damion mark', reportShared: 'Shared', date: '2026-10-04', notes: 'Cairo, Egypt, EMEA', reviewedBy: 'Rajat' },
-        { id: 'imp20', client: 'HCL', subclient: 'Pepsico', activity: 'Pola - 076', status: 'Ongoing', engineer: 'Damion & Sricharan', reportShared: 'Pending', date: '2026-07-05', notes: 'EMEA' },
-        { id: 'imp21', client: 'HCL', subclient: 'Pepsico', activity: 'Pola-60', status: 'Ongoing', engineer: '', reportShared: 'Pending', date: '', notes: '', reviewedBy: 'Rajat' },
-        { id: 'imp22', client: 'Infosys', subclient: 'PR', activity: 'Dublin', status: 'Completed', engineer: 'Sricharan', reportShared: 'Shared', date: '2026-03-30', notes: 'Ireland, Ireland', reviewedBy: 'Rajat' },
-        { id: 'imp23', client: 'Infosys', subclient: 'PR', activity: 'Newzeland', status: 'Completed', engineer: 'Rajat', reportShared: 'Shared', date: '2026-01-27', notes: 'Newzeland, Newzeland', reviewedBy: 'Rajat' },
-        { id: 'imp24', client: 'Infosys', subclient: 'PR', activity: 'Jakarata', status: 'Completed', engineer: 'Sricharan', reportShared: 'Shared', date: '2026-05-12', notes: 'Indonesia, Indonesia', reviewedBy: 'Sricharan' },
-        { id: 'imp25', client: 'Infosys', subclient: 'Reckitt', activity: 'Rogers/Bentonville', status: 'Completed', engineer: 'Raj vinod', reportShared: 'Shared', date: '2025-09-08', notes: 'India', reviewedBy: 'Sricharan' },
-        { id: 'imp26', client: 'Infosys', subclient: 'Reckitt', activity: 'Hyderabad Global Hub', status: 'Completed', engineer: 'Raj vinod', reportShared: 'Shared', date: '2025-09-05', notes: 'India', reviewedBy: 'Sricharan' },
-        { id: 'imp27', client: 'Infosys', subclient: 'Reckitt', activity: 'Montvale -as-is', status: 'Completed', engineer: 'Raj vinod', reportShared: 'Shared', date: '2025-09-05', notes: 'United States', reviewedBy: 'Sricharan' },
-        { id: 'imp28', client: 'Infosys', subclient: 'Reckitt', activity: 'Gurgaon-HQ-CyberPark', status: 'Completed', engineer: 'Raj vinod', reportShared: 'Shared', date: '2025-09-17', notes: 'India', reviewedBy: 'Sricharan' },
-        { id: 'imp29', client: 'Infosys', subclient: 'Reckitt', activity: 'Sydney World Square', status: 'Completed', engineer: 'Raj vinod', reportShared: 'Shared', date: '2025-09-18', notes: 'Australia', reviewedBy: 'Rajat' },
-        { id: 'imp30', client: 'Infosys', subclient: 'Reckitt', activity: 'Heidelberg R&D Site', status: 'Completed', engineer: 'Raj vinod/ Sricharan rework', reportShared: 'Shared', date: '2025-09-19', notes: 'Germany', reviewedBy: 'Rajat' },
-        { id: 'imp31', client: 'Infosys', subclient: 'Reckitt', activity: 'Heidelberg Corp Office', status: 'Completed', engineer: 'Raj vinod/ Sricharan rework', reportShared: 'Shared', date: '2025-09-19', notes: 'Germany' },
-        { id: 'imp32', client: 'Infosys', subclient: 'Reckitt', activity: 'Atlanta LC', status: 'Completed', engineer: 'Raj vinod', reportShared: 'Shared', date: '2025-09-17', notes: 'United States', reviewedBy: 'Sricharan' },
-        { id: 'imp33', client: 'Infosys', subclient: 'Reckitt', activity: 'Shanghai Manon', status: 'Completed', engineer: 'Raj vinod', reportShared: 'Shared', date: '2025-09-19', notes: 'China', reviewedBy: 'Sricharan' },
-        { id: 'imp34', client: 'Infosys', subclient: 'Reckitt', activity: 'Suzhou R&D', status: 'Completed', engineer: 'Raj vinod', reportShared: 'Shared', date: '2025-10-21', notes: 'China', reviewedBy: 'Sricharan' },
-        { id: 'imp35', client: 'Infosys', subclient: 'Reckitt', activity: 'Jakarta', status: 'Completed', engineer: 'Raj vinod', reportShared: 'Shared', date: '2025-10-17', notes: 'Indonesia', reviewedBy: 'Sricharan' },
-        { id: 'imp36', client: 'Infosys', subclient: 'Reckitt', activity: 'Kuala Lumpur', status: 'Completed', engineer: 'Raj vinod / Sricharan rework', reportShared: 'Shared', date: '2025-10-16', notes: 'Malaysia', reviewedBy: 'Sricharan' },
-        { id: 'imp37', client: 'Infosys', subclient: 'Reckitt', activity: 'Schiphol', status: 'Completed', engineer: 'Raj vinod/ sricharan rework', reportShared: 'Shared', date: '2025-10-28', notes: 'Netherlands', reviewedBy: 'Sricharan' },
-        { id: 'imp38', client: 'Infosys', subclient: 'Reckitt', activity: 'Massy', status: 'Completed', engineer: 'Raj vinod', reportShared: 'Shared', date: '', notes: 'France', reviewedBy: 'Sricharan' },
-        { id: 'imp39', client: 'Infosys', subclient: 'Reckitt', activity: 'Hyderabad Global Hub', status: 'Completed', engineer: 'Raj vinod', reportShared: 'Shared', date: 'post wss', notes: 'India', reviewedBy: 'Sricharan' },
-        { id: 'imp40', client: 'Infosys', subclient: 'Reckitt', activity: 'Montvale - full site desgin', status: 'Completed', engineer: 'Raj vinod', reportShared: 'Shared', date: '2025-09-05', notes: 'United States', reviewedBy: 'Rajat' },
-        { id: 'imp41', client: 'BDB', subclient: 'BDB Site', activity: 'Tatabanya Hungary BDB Site', status: 'Completed', engineer: 'Rajath/sricharan', reportShared: 'Shared', date: '2026-05-15', notes: 'Hungary, Hungary', reviewedBy: 'Rajat' },
-        { id: 'imp42', client: 'HCL', subclient: 'Abbvie', activity: 'Worcester,', status: 'Completed', engineer: 'sricharan /Damion', reportShared: 'Pending', date: '2026-07-07', notes: 'Worcester, USA, USA' },
-        { id: 'imp43', client: 'HCL', subclient: 'Kenvue', activity: 'Post Wifi Survey - Phillippines', status: 'Completed', engineer: 'Rowen Bien Amoyan', reportShared: 'Shared', date: '2026-07-01', notes: 'Activity completed,Report shared' },
-        { id: 'imp44', client: 'HCL', subclient: 'Kenvue', activity: 'Wireless site survey - Mumbai', status: 'Completed', engineer: '', reportShared: 'Shared', date: '2025-08-10', notes: '' },
-        { id: 'imp45', client: 'HCL', subclient: 'Kenvue', activity: 'Wireless site survey report - Mumbai', status: 'Completed', engineer: '', reportShared: 'Shared', date: '2025-10-15', notes: '' },
-        { id: 'imp46', client: 'HCL', subclient: 'JNJ', activity: 'Active Wireless Site Survey - Sydney', status: 'Completed', engineer: '', reportShared: 'Shared', date: '2025-09-15', notes: '' },
-        { id: 'imp47', client: 'HCL', subclient: 'JNJ', activity: 'Active Wireless Site Survey - Sydney', status: 'Completed', engineer: '', reportShared: 'Shared', date: '2025-09-16', notes: '' },
-        { id: 'imp48', client: 'HCL', subclient: 'JNJ', activity: 'Active Wireless Site Survey - Sydney', status: 'Completed', engineer: '', reportShared: 'Shared', date: '2025-09-17', notes: '' },
-        { id: 'imp49', client: 'HCL', subclient: 'JNJ', activity: 'Active Wireless Site Survey - Sydney', status: 'Completed', engineer: '', reportShared: 'Shared', date: '2025-09-18', notes: '' },
-        { id: 'imp50', client: 'HCL', subclient: 'JNJ', activity: 'Wi-Fi site survey report - Sydney', status: 'Completed', engineer: '', reportShared: 'Shared', date: '2025-09-29', notes: '' },
-        { id: 'imp51', client: 'HCL', subclient: 'JNJ', activity: 'Post Wifi Survey with new requirement - Sydney', status: 'Ongoing', engineer: 'Amodh Kumar', reportShared: 'Shared', date: '2026-04-02', notes: 'Inprogress' },
-        { id: 'imp52', client: 'HCL', subclient: 'JNJ', activity: 'Active  site survey report - Japan', status: 'Completed', engineer: '', reportShared: 'Shared', date: '2025-09-26', notes: '' },
-        { id: 'imp53', client: 'HCL', subclient: 'JNJ', activity: 'Active Wireless Site Survey - Japan', status: 'Completed', engineer: '', reportShared: 'Shared', date: '2025-09-18', notes: '' },
-        { id: 'imp54', client: 'HCL', subclient: 'JNJ', activity: 'Active Wireless Site Survey - Hyderabad', status: 'Completed', engineer: '', reportShared: 'Shared', date: '2025-09-16', notes: '' },
-        { id: 'imp55', client: 'HCL', subclient: 'JNJ', activity: 'Active Wireless Site Survey - Hyderabad', status: 'Completed', engineer: '', reportShared: 'Shared', date: '2025-09-22', notes: '' },
-        { id: 'imp56', client: 'HCL', subclient: 'JNJ', activity: 'Active Wireless Site Survey report - Hyderabad', status: 'Completed', engineer: '', reportShared: 'Shared', date: '2025-09-29', notes: '' },
-        { id: 'imp57', client: 'HCL', subclient: 'JNJ', activity: 'Predictive site survey - Okinawa- Japan', status: 'Completed', engineer: '', reportShared: 'Shared', date: '2026-01-01', notes: 'Engineer intrevention not required, since predictive' },
-        { id: 'imp58', client: 'HCL', subclient: 'JNJ', activity: 'Post Wifi Survey with new requirement - Sydney', status: 'Completed', engineer: 'Amodh Kumar', reportShared: 'Shared', date: '2026-05-02', notes: '' }
-      ],
-      agenda: [
-        { id: 't1', task: 'Share pending survey report - Pola - 076 (Pepsico)', assignedTo: 'Sricharan', done: false },
-        { id: 't2', task: 'Complete site survey - Pola-60 (Pepsico)', assignedTo: '', done: false },
-        { id: 't3', task: 'Follow up on Post Wifi Survey with new requirement - Sydney (J&J)', assignedTo: 'Amodh Kumar', done: false }
-      ],
-      pipeline: [
-        { id: 'p1', name: 'Nestle - Warehouse Wireless Refresh', client: 'Nestle', stage: 'Prospecting', owner: 'Rahul Menon', targetDate: '2026-08-20', notes: 'Awaiting site access approval' },
-        { id: 'p2', name: 'Cipla - New DC Predictive Survey', client: 'Cipla', stage: 'Survey Scheduled', owner: 'Sana Iyer', targetDate: '2026-08-12', notes: 'Kickoff call done' },
-        { id: 'p3', name: 'Wipro - Campus AP Upgrade', client: 'Wipro', stage: 'In Progress', owner: 'David Chen', targetDate: '2026-08-08', notes: 'Heatmap 60% complete' },
-        { id: 'p4', name: 'TCS - HQ Coverage Validation', client: 'TCS', stage: 'Closed', owner: 'Rahul Menon', targetDate: '2026-07-25', notes: 'Report delivered' }
-      ],
-      kba: [
-        { id: 'k1', title: 'Wireless heatmap survey checklist', url: '', notes: 'Standard SOP for pre/post survey heatmap capture' },
-        { id: 'k2', title: 'AP placement guidelines', url: '', notes: 'Reference spacing & mounting height guidance' }
-      ],
+      clients: {},
+      activities: [],
+      agenda: [],
+      pipeline: [],
+      kba: [],
       checklist: {
-        'Active Site Survey': [
-          { id: 'c1', text: 'Confirm site access & safety induction completed', done: false },
-          { id: 'c2', text: 'Charge survey equipment (AP, laptop, spectrum analyzer)', done: false },
-          { id: 'c3', text: 'Obtain latest floor plan / CAD from client', done: false },
-          { id: 'c4', text: 'Confirm onsite point of contact & escort', done: false }
-        ],
+        'Active Site Survey': [],
         'Predective Site Survey': [],
         'APOS': [],
         'Post Implementation Survey': []
@@ -2089,7 +2009,7 @@
     /* ===================== PERSISTENCE ===================== */
     async function loadState() {
       try {
-        const response = await fetch('/api/state');
+        const response = await fetch('/api/state', { cache: 'no-store' });
         if (response.ok) {
           const parsed = await response.json();
           if (parsed && parsed.clients && parsed.activities) {
