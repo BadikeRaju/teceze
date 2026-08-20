@@ -1879,7 +1879,8 @@
   <div class="corner-stack" id="screenAppCorners" style="display:none;">
     <button class="fab" style="border-color:var(--cyan);background:var(--surface-3);" onclick="toggleChatbot()"><span
         class="dot" style="background:var(--cyan)"></span>AI Assistant</button>
-    <button class="fab" onclick="openKBA()"><span class="dot"></span>KBA</button>
+    <button class="fab" onclick="openKBA()"><span class="dot" style="background:var(--cyan)"></span>KBA</button>
+    <button class="fab" onclick="openWss()"><span class="dot" style="background:var(--cyan)"></span>WSS License</button>
     <button class="fab fab-amber" onclick="openChecklist()"><span class="dot"></span>Prechecklist</button>
   </div>
 
@@ -1982,6 +1983,46 @@
     </div>
   </div>
 
+  <!-- ===================== WSS LICENSE MODAL ===================== -->
+  <div class="modal-overlay" id="wssModal">
+    <div class="modal-box" style="max-width:700px;">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title">WSS License Tracking</div>
+          <div class="modal-sub">Wireless survey software license status per engineer/laptop.</div>
+        </div>
+        <button class="modal-close" onclick="closeWss()">✕</button>
+      </div>
+      
+      <div class="tabs" style="display:flex; gap:10px; margin-bottom:15px;">
+        <button class="btn btn-sm btn-primary" id="wssTabActive" style="flex:1;" onclick="setWssTab('Active')">✓ Active</button>
+        <button class="btn btn-sm" id="wssTabLogoutted" style="flex:1; background:var(--surface-2);" onclick="setWssTab('Logoutted')">⏻ Logoutted</button>
+      </div>
+
+      <div id="wssList" style="max-height: 400px; overflow-y: auto; margin-bottom: 20px;"></div>
+
+      <div class="modal-form" style="background:var(--surface-2); padding:15px; border-radius:8px;">
+        <div style="font-weight:600; margin-bottom:10px; font-size:14px; color:var(--text);">+ Add New License Record</div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+          <input type="text" id="wssEngineer" placeholder="Engineer Name" style="flex:1; min-width:150px;">
+          <input type="text" id="wssDetails" placeholder="Activity Date & Details" style="flex:2; min-width:200px;">
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+          <input type="text" id="wssLaptop" placeholder="Laptop Hostname" style="flex:2; min-width:200px;">
+          <input type="text" id="wssProvided" placeholder="Provided By" style="flex:1; min-width:150px;">
+          <input type="date" id="wssDate" style="flex:1; min-width:150px;">
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px;">
+          <select id="wssStatus" class="field" style="margin:0; width:120px; padding:8px; border-radius:4px; background:var(--surface-1); border:1px solid var(--border); color:var(--text);">
+            <option value="Active">Active</option>
+            <option value="Logoutted">Logoutted</option>
+          </select>
+          <button class="btn btn-sm btn-primary" onclick="addWssLicense()">Add Record</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     /* ===================== DATA MODEL ===================== */
     const STORAGE_KEY = 'teceze-wireless-tracker-v1';
@@ -1992,6 +2033,34 @@
       agenda: [],
       pipeline: [],
       kba: [],
+      wssLicenses: [
+        { id: 'wss_1', engineer: 'Siva.Jeya', details: '24-02-2026 & Pepsico Pola-061', laptop: 'DESKTOP-OQVD07T (Lenovo)', providedBy: 'Rajkumar', date: '', status: 'Logoutted' },
+        { id: 'wss_2', engineer: 'Manu Vaso', details: '24-02-2026 & SRS Kanpur', laptop: "Gaurav's Lenovo", providedBy: 'Rajat', date: '', status: 'Logoutted' },
+        { id: 'wss_3', engineer: 'Ganesh', details: '24-02-26&usam-809', laptop: 'Dell Inc. Latitude 7420', providedBy: 'Sricharan', date: '', status: 'Logoutted' },
+        { id: 'wss_4', engineer: 'Haris', details: '25-02-2026 & THAI-002', laptop: 'LENOVO 20WKS02400', providedBy: 'Sricharan', date: '', status: 'Logoutted' },
+        { id: 'wss_5', engineer: 'Haris', details: '25-02-2026 & SERB-009_Serbia', laptop: 'Zeljko Bugarski', providedBy: 'Rajat', date: '', status: 'Logoutted' },
+        { id: 'wss_6', engineer: 'Mano', details: 'CHIN-062_china', laptop: 'XIAOMI Redmi Book 14 2024', providedBy: 'Sricharan', date: '', status: 'Logoutted' },
+        { id: 'wss_7', engineer: 'Ganesh', details: '27-02-2026 & Marat - Kyrgystan 26th Feb', laptop: 'Marat-pepsiCo-Zbook', providedBy: 'Sricharan', date: '', status: 'Logoutted' },
+        { id: 'wss_8', engineer: 'Mano', details: '03-03-26 _ SAFR-072', laptop: 'LENOVO 21AJS3JT3R', providedBy: 'Sricharan', date: '', status: 'Logoutted' },
+        { id: 'wss_9', engineer: 'Siva Jeya', details: '09-03-2026 - Pola_061', laptop: 'DESKTOP-OQVD07T (Lenovo Thinkpad)', providedBy: 'Rajkumar', date: '', status: 'Logoutted' },
+        { id: 'wss_10', engineer: 'Mano', details: '20/03/2026_report generation part', laptop: 'Kishore Ramesh', providedBy: 'Sricharan', date: '24-03-3026', status: 'Logoutted' },
+        { id: 'wss_11', engineer: 'Rajath', details: '20/03/2026_report generation part', laptop: 'Rohan kumar', providedBy: 'Sricharan', date: '', status: 'Logoutted' },
+        { id: 'wss_12', engineer: 'Sricharan', details: '08/08/2026_report generation part', laptop: 'Sricharan', providedBy: 'Sricharan', date: '', status: 'Active' },
+        { id: 'wss_13', engineer: 'Haris', details: '16/03/2026_report generation part', laptop: 'Rajat-LENOVO 21M3007NIG', providedBy: 'Rajat', date: '', status: 'Active' },
+        { id: 'wss_14', engineer: 'Mano', details: '04/03/2026_report generation part', laptop: 'Sanjeevan LENOVO 21AJS3JT3R', providedBy: 'Rajat', date: '', status: 'Logoutted' },
+        { id: 'wss_15', engineer: 'Haris', details: '20/03/2026_report generation part', laptop: 'Rahul', providedBy: 'Sricharan', date: '24-03-3026', status: 'Logoutted' },
+        { id: 'wss_16', engineer: 'Srini', details: '24/02/2026_report generation part', laptop: 'Damion Lenovo Laptop', providedBy: 'Sricharan', date: '', status: 'Logoutted' },
+        { id: 'wss_17', engineer: 'Rajat', details: '24/03/2026 - Report Generation', laptop: 'Rohan- Laptop', providedBy: 'Rajkumar', date: '24-03-3026', status: 'Logoutted' },
+        { id: 'wss_18', engineer: 'Srini', details: '25/03/26_PR activity', laptop: 'Inayat- HP HP EliteBook 645 14 inch G9 Notebook PC', providedBy: 'Rajat', date: '26-03-2026', status: 'Logoutted' },
+        { id: 'wss_19', engineer: 'Rajath', details: 'Egypt -108', laptop: "Asmaa's Laptop", providedBy: 'Rajat', date: '27/3/26', status: 'Logoutted' },
+        { id: 'wss_20', engineer: 'Ganesh', details: '30-03-26&poland-47', laptop: 'HP HP Laptop 15s-eq2xxx', providedBy: 'Sricharan', date: '30/3/26', status: 'Logoutted' },
+        { id: 'wss_21', engineer: 'Rajath', details: '07/04/26 - poland -076', laptop: 'POLAND076_SALAMA', providedBy: 'Rajat', date: '7/4/26', status: 'Logoutted' },
+        { id: 'wss_22', engineer: 'Haris', details: '08/04/26 - pola -60', laptop: 'Adeyinka/Poland60', providedBy: 'Sricharan', date: '8/4/26', status: 'Logoutted' },
+        { id: 'wss_23', engineer: 'Rajath', details: '08/04/26 - pola-76', laptop: 'SALAMA HP POLA076', providedBy: 'Sricharan', date: '8/4/26', status: 'Logoutted' },
+        { id: 'wss_24', engineer: 'Srini', details: '23/04/26- hungary site', laptop: 'Rashed_Hungary Site', providedBy: 'Sricharan', date: '21/4/26', status: 'Logoutted' },
+        { id: 'wss_25', engineer: 'Rajath', details: '11/05/26- PR -INDONESIA', laptop: 'LENOVO 20W1S4GX04', providedBy: 'Sricharan', date: '11/5/26', status: 'Logoutted' },
+        { id: 'wss_26', engineer: 'Siva Jeya', details: '26/06/2026', laptop: '4Y3FBX3 - Lenov', providedBy: 'Rajkumar', date: '25/06/2026', status: 'Logoutted' }
+      ],
       checklist: {
         'Active Site Survey': [],
         'Predective Site Survey': [],
@@ -2016,6 +2085,7 @@
             if (!parsed.pipeline) parsed.pipeline = state.pipeline;
             if (!parsed.kba) parsed.kba = state.kba;
             if (!parsed.checklist) parsed.checklist = state.checklist;
+            if (!parsed.wssLicenses) parsed.wssLicenses = state.wssLicenses;
             if (!parsed.engineerEmails) parsed.engineerEmails = {};
             if (!parsed.emailConfig) parsed.emailConfig = { endpoint: '' };
             if (Array.isArray(parsed.checklist)) {
@@ -2792,6 +2862,100 @@
 
     /* ---- PRECHECKLIST MODAL (categorized) ---- */
     let checklistNav = { view: 'categories', category: null };
+    /* ---- WSS LICENSE TRACKING ---- */
+    let currentWssTab = 'Active';
+
+    function openWss() {
+      document.getElementById('wssModal').classList.add('show');
+      renderWssLicenses();
+    }
+    
+    function closeWss() {
+      document.getElementById('wssModal').classList.remove('show');
+    }
+
+    function setWssTab(tab) {
+      currentWssTab = tab;
+      if (tab === 'Active') {
+        document.getElementById('wssTabActive').classList.add('btn-primary');
+        document.getElementById('wssTabActive').style.background = '';
+        document.getElementById('wssTabLogoutted').classList.remove('btn-primary');
+        document.getElementById('wssTabLogoutted').style.background = 'var(--surface-2)';
+      } else {
+        document.getElementById('wssTabLogoutted').classList.add('btn-primary');
+        document.getElementById('wssTabLogoutted').style.background = '';
+        document.getElementById('wssTabActive').classList.remove('btn-primary');
+        document.getElementById('wssTabActive').style.background = 'var(--surface-2)';
+      }
+      renderWssLicenses();
+    }
+
+    function renderWssLicenses() {
+      const listEl = document.getElementById('wssList');
+      const filtered = (state.wssLicenses || []).filter(l => l.status === currentWssTab);
+      
+      const cards = filtered.map(l => `
+        <div class="chk-item" style="display:flex; justify-content:space-between; align-items:center; background:var(--surface-1); padding:10px; margin-bottom:8px; border-radius:6px; border:1px solid var(--border);">
+          <div style="flex:1;">
+            <div style="font-weight:bold; color:var(--text); margin-bottom:4px;">
+              ${escapeHtml(l.engineer)} 
+              <span class="badge ${l.status === 'Active' ? 'badge-completed' : 'badge-onhold'}" style="margin-left:8px; font-size:11px;">${escapeHtml(l.status)}</span>
+            </div>
+            <div style="font-size:12px; color:var(--muted); margin-bottom:2px;">
+              ${escapeHtml(l.date ? (l.date + ' ' + (l.details||'')) : (l.details||''))}
+            </div>
+            <div style="font-size:12px; color:var(--muted); margin-bottom:2px;">
+              💻 ${escapeHtml(l.laptop || '')}
+            </div>
+            <div style="font-size:12px; color:var(--muted);">
+              Provided by: ${escapeHtml(l.providedBy || '')}
+            </div>
+          </div>
+          <button class="icon-btn" onclick="removeWssLicense('${l.id}')" title="Remove" style="margin-left:10px;">✕</button>
+        </div>
+      `).join('');
+      
+      listEl.innerHTML = cards || `<div class="empty-state"><h4>No ${currentWssTab.toLowerCase()} licenses</h4></div>`;
+    }
+
+    function addWssLicense() {
+      const eng = document.getElementById('wssEngineer').value.trim();
+      const det = document.getElementById('wssDetails').value.trim();
+      const lap = document.getElementById('wssLaptop').value.trim();
+      const prov = document.getElementById('wssProvided').value.trim();
+      const dt = document.getElementById('wssDate').value;
+      const stat = document.getElementById('wssStatus').value;
+      
+      if (!eng) return showToast("Engineer name is required");
+      
+      if (!state.wssLicenses) state.wssLicenses = [];
+      state.wssLicenses.push({
+        id: 'wss_' + Date.now(),
+        engineer: eng,
+        details: det,
+        laptop: lap,
+        providedBy: prov,
+        date: dt,
+        status: stat
+      });
+      
+      document.getElementById('wssEngineer').value = '';
+      document.getElementById('wssDetails').value = '';
+      document.getElementById('wssLaptop').value = '';
+      document.getElementById('wssProvided').value = '';
+      document.getElementById('wssDate').value = '';
+      
+      saveState();
+      renderWssLicenses();
+      showToast("License record added");
+    }
+
+    function removeWssLicense(id) {
+      if (!confirm("Remove this license record?")) return;
+      state.wssLicenses = (state.wssLicenses || []).filter(l => l.id !== id);
+      saveState();
+      renderWssLicenses();
+    }
 
     function openChecklist() {
       checklistNav = { view: 'categories', category: null };

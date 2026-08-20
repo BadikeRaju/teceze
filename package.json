@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/BadikeRaju/teceze#readme",
   "dependencies": {
-    "mongodb": "^7.5.0"
+    "mongodb": "^7.5.0",
+    "xlsx": "^0.18.5"
   }
 }
