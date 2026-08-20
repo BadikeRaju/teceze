@@ -1820,6 +1820,12 @@
           <div class="brand-name">TECEZE</div>
         </div>
         <div class="login-tag">Wireless Site Survey Tracker — internal access</div>
+        
+        <div class="tabs" style="display:flex; margin-bottom: 20px;">
+          <button class="btn btn-sm btn-primary" id="tabSignin" style="flex:1; border-radius: 4px 0 0 4px;" onclick="setLoginTab('signin')">Sign In</button>
+          <button class="btn btn-sm" id="tabSignup" style="flex:1; border-radius: 0 4px 4px 0; background:var(--surface-2);" onclick="setLoginTab('signup')">Sign Up</button>
+        </div>
+
         <div class="field">
           <label>Username</label>
           <input type="text" id="loginUser" placeholder="Enter username" autocomplete="username">
@@ -1829,7 +1835,7 @@
           <input type="password" id="loginPass" placeholder="Enter password" autocomplete="current-password">
         </div>
         <div class="login-err" id="loginErr"></div>
-        <button class="btn btn-primary" onclick="doLogin()">Sign in</button>
+        <button class="btn btn-primary" id="loginBtn" onclick="doAuthAction()">Sign in</button>
         <div class="login-hint">Internal tool for Teceze wireless engineering &amp; survey operations.<br>Contact your
           admin if you don't have access.</div>
       </div>
@@ -2115,19 +2121,82 @@
     }
 
     /* ===================== LOGIN ===================== */
-    function doLogin() {
+    let loginMode = 'signin';
+
+    function setLoginTab(mode) {
+      loginMode = mode;
+      if (mode === 'signin') {
+        document.getElementById('tabSignin').classList.add('btn-primary');
+        document.getElementById('tabSignin').style.background = '';
+        document.getElementById('tabSignup').classList.remove('btn-primary');
+        document.getElementById('tabSignup').style.background = 'var(--surface-2)';
+        document.getElementById('loginBtn').textContent = 'Sign In';
+      } else {
+        document.getElementById('tabSignup').classList.add('btn-primary');
+        document.getElementById('tabSignup').style.background = '';
+        document.getElementById('tabSignin').classList.remove('btn-primary');
+        document.getElementById('tabSignin').style.background = 'var(--surface-2)';
+        document.getElementById('loginBtn').textContent = 'Sign Up';
+      }
+      document.getElementById('loginErr').textContent = '';
+      document.getElementById('loginErr').style.color = 'var(--bad)';
+    }
+
+    async function doAuthAction() {
       const u = document.getElementById('loginUser').value.trim();
       const p = document.getElementById('loginPass').value.trim();
       const err = document.getElementById('loginErr');
-      if (!u || !p) { err.textContent = 'Enter both username and password.'; return; }
-      err.textContent = '';
-      currentUser = u;
-      document.getElementById('userName').textContent = u;
-      document.getElementById('userInitial').textContent = u.slice(0, 1).toUpperCase();
-      document.getElementById('screen-login').classList.remove('active');
-      document.getElementById('screen-app').classList.add('active');
-      document.getElementById('screenAppCorners').style.display = 'flex';
-      goWelcome();
+      
+      if (!u || !p) { 
+        err.style.color = 'var(--bad)';
+        err.textContent = 'Enter both username and password.'; 
+        return; 
+      }
+      
+      err.style.color = 'var(--text)';
+      err.textContent = 'Connecting...';
+      const btn = document.getElementById('loginBtn');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`/api/auth?action=${loginMode}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: u, password: p })
+        });
+        const data = await res.json();
+        
+        if (!res.ok) {
+          err.style.color = 'var(--bad)';
+          err.textContent = data.error || 'Authentication failed.';
+          btn.disabled = false;
+          return;
+        }
+
+        if (loginMode === 'signup') {
+          // Auto switch to sign in after successful sign up
+          err.style.color = 'var(--ok)';
+          err.textContent = 'Account created successfully! Signing in...';
+          await new Promise(r => setTimeout(r, 800));
+        }
+
+        // Proceed to app
+        err.textContent = '';
+        currentUser = data.username;
+        document.getElementById('userName').textContent = data.username;
+        document.getElementById('userInitial').textContent = data.username.slice(0, 1).toUpperCase();
+        document.getElementById('screen-login').classList.remove('active');
+        document.getElementById('screen-app').classList.add('active');
+        document.getElementById('screenAppCorners').style.display = 'flex';
+        goWelcome();
+
+      } catch (e) {
+        console.error(e);
+        err.style.color = 'var(--bad)';
+        err.textContent = 'Network error. Try again.';
+      } finally {
+        btn.disabled = false;
+      }
     }
     function doLogout() {
       document.getElementById('screen-app').classList.remove('active');
