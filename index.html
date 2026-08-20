@@ -2089,9 +2089,9 @@
     /* ===================== PERSISTENCE ===================== */
     async function loadState() {
       try {
-        const res = await window.storage.get(STORAGE_KEY, true);
-        if (res && res.value) {
-          const parsed = JSON.parse(res.value);
+        const value = localStorage.getItem(STORAGE_KEY);
+        if (value) {
+          const parsed = JSON.parse(value);
           if (parsed && parsed.clients && parsed.activities) {
             if (!parsed.pipeline) parsed.pipeline = state.pipeline;
             if (!parsed.kba) parsed.kba = state.kba;
@@ -2111,7 +2111,7 @@
     }
     async function saveState(skipLiveWrite) {
       try {
-        await window.storage.set(STORAGE_KEY, JSON.stringify(state), true);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       } catch (e) { console.error('Storage save failed', e); }
       if (!skipLiveWrite && typeof liveSyncHandle !== 'undefined' && liveSyncHandle) {
         writeLiveSyncFile();
