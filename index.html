@@ -1885,6 +1885,7 @@
   <div class="corner-stack" id="screenAppCorners" style="display:none;">
     <button class="fab" style="border-color:var(--cyan);background:var(--surface-3);" onclick="toggleChatbot()"><span
         class="dot" style="background:var(--cyan)"></span>AI Assistant</button>
+    <button class="fab" onclick="window.open('https://doc-rag-teceze.streamlit.app/', '_blank')"><span class="dot" style="background:var(--cyan)"></span>RAG-Documents</button>
     <button class="fab" onclick="openKBA()"><span class="dot" style="background:var(--cyan)"></span>KBA</button>
     <button class="fab" onclick="openWss()"><span class="dot" style="background:var(--cyan)"></span>WSS License</button>
     <button class="fab fab-amber" onclick="openChecklist()"><span class="dot"></span>Prechecklist</button>
@@ -2375,6 +2376,7 @@
       <div class="agenda-tags">
         <span class="tag">${escapeHtml(t.assignedTo || 'Unassigned')}</span>
         ${t.assignedEmail ? `<span class="tag" title="Notified via email">✉️ ${t.notified ? 'sent' : 'queued'}</span>` : ''}
+        ${t.meetingLink ? `<a href="${escapeHtml(t.meetingLink.startsWith('http') ? t.meetingLink : 'https://' + t.meetingLink)}" target="_blank" class="tag link" style="text-decoration:none;">🔗 Meeting</a>` : ''}
       </div>
     </div>`).join('') || `<div class="empty-state"><h4>No tasks yet</h4><p>Add today's work below and assign it to a wireless engineer.</p></div>`;
 
@@ -2419,6 +2421,7 @@
             ${engOptions}
           </select>
           <input type="email" id="newTaskEmail" placeholder="Assignee email" style="width:170px;">
+          <input type="text" id="newTaskMeeting" placeholder="Meeting link" style="width:140px;">
           <input type="time" id="newTaskFrom" title="From time" style="width:120px;">
           <input type="time" id="newTaskTo" title="To time" style="width:120px;">
           <button class="btn btn-sm btn-primary" onclick="addAgendaTask()">Add</button>
@@ -2452,6 +2455,7 @@
       const text = document.getElementById('newTaskText').value.trim();
       const eng = document.getElementById('newTaskEngineer').value;
       const email = document.getElementById('newTaskEmail').value.trim();
+      const meetingLink = document.getElementById('newTaskMeeting').value.trim();
       const timeFrom = document.getElementById('newTaskFrom').value;
       const timeTo = document.getElementById('newTaskTo').value;
       if (!text) { showToast('Enter a task description'); return; }
@@ -2459,7 +2463,7 @@
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('Enter a valid email address'); return; }
         if (eng) setEngineerEmail(eng, email);
       }
-      const item = { id: 't' + Date.now(), task: text, assignedTo: eng, assignedEmail: email, timeFrom, timeTo, done: false, notified: false };
+      const item = { id: 't' + Date.now(), task: text, assignedTo: eng, assignedEmail: email, meetingLink, timeFrom, timeTo, done: false, notified: false };
       state.agenda.push(item);
       saveState();
       render();
@@ -2781,6 +2785,7 @@
         <span>Engineer: ${escapeHtml(a.engineer || 'Unassigned')}</span>
         <span class="badge badge-${a.reportShared === 'Shared' ? 'shared' : 'pending'}" style="padding:2px 8px;">${escapeHtml(a.reportShared)}</span>
         ${a.reviewedBy ? `<span>Reviewed by: ${escapeHtml(a.reviewedBy)}</span>` : ''}
+        ${a.reportView ? `<span><a href="${escapeHtml(a.reportView.startsWith('http') ? a.reportView : 'https://' + a.reportView)}" target="_blank" class="link">${escapeHtml(a.reportView)}</a></span>` : ''}
         <span style="font-family:var(--font-mono);">${escapeHtml(a.date || '—')}</span>
       </div>
     </div>`).join('') || `<div class="empty-state"><h4>No activities</h4><p>Nothing in this category yet.</p></div>`;
@@ -3222,10 +3227,10 @@
     /* ===================== EXCEL IMPORT / TEMPLATE ===================== */
     /* Builds a workbook from whatever is currently tracked on the dashboard, so every download reflects live data. */
     function buildActivitiesWorkbook() {
-      const header = ['Client', 'Subclient', 'Activity', 'Status', 'Engineer', 'ReportShared', 'Date', 'Notes', 'Reviewed reports'];
+      const header = ['Client', 'Subclient', 'Activity', 'Status', 'Engineer', 'ReportShared', 'Date', 'Notes', 'Reviewed reports', 'Report view'];
       const rows = state.activities.length
-        ? state.activities.map(a => [a.client, a.subclient, a.activity, a.status, a.engineer, a.reportShared, a.date, a.notes, a.reviewedBy || ''])
-        : [['HCL', 'Pepsico', 'Example: AP survey - Floor 3', 'Ongoing', 'Rahul Menon', 'Pending', '2026-08-01', '', '']];
+        ? state.activities.map(a => [a.client, a.subclient, a.activity, a.status, a.engineer, a.reportShared, a.date, a.notes, a.reviewedBy || '', a.reportView || ''])
+        : [['HCL', 'Pepsico', 'Example: AP survey - Floor 3', 'Ongoing', 'Rahul Menon', 'Pending', '2026-08-01', '', '', '']];
       const wsData = [header, ...rows];
       const ws = XLSX.utils.aoa_to_sheet(wsData);
       const wb = XLSX.utils.book_new();
@@ -3261,7 +3266,8 @@
           reportShared: String(r.ReportShared || r['Report Shared'] || r.reportShared || 'Pending').trim(),
           date: String(r.Date || r.date || ''),
           notes: String(r.Notes || r.notes || ''),
-          reviewedBy: String(r['Reviewed reports'] || r['Reviewed Reports'] || r.ReviewedReports || r.reviewedBy || r['Reviewed by'] || '').trim()
+          reviewedBy: String(r['Reviewed reports'] || r['Reviewed Reports'] || r.ReviewedReports || r.reviewedBy || r['Reviewed by'] || '').trim(),
+          reportView: String(r['Report view'] || r['Report View'] || r.reportView || '').trim()
         });
       });
 
