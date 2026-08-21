@@ -57,7 +57,7 @@ module.exports = async (req, res) => {
 
       return res.status(200).json({ success: true, username });
 
-    } else if (action === 'login') {
+    } else if (action === 'login' || action === 'signin') {
       // Find user
       const user = await users.findOne({ username: { $regex: new RegExp(`^${username}$`, 'i') } });
       if (!user) {
