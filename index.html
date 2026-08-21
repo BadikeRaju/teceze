@@ -2494,7 +2494,7 @@
     async function sendAgendaEmailNotification(item) {
       const endpoint = state.emailConfig && state.emailConfig.endpoint;
       const subject = encodeURIComponent(`New task assigned: ${item.task}`);
-      const bodyText = `You've been assigned a new task:\n\n${item.task}\n\nTime: ${item.timeFrom || '—'} to ${item.timeTo || '—'}\n\n— Wireless Site Survey Tracker`;
+      const bodyText = `You've been assigned a new task:\n\n${item.task}\n\nTime: ${item.timeFrom || '—'} to ${item.timeTo || '—'}${item.meetingLink ? '\nMeeting Link: ' + item.meetingLink : ''}\n\n— Wireless Site Survey Tracker`;
       if (!endpoint) {
         // No SMTP/email API configured yet — fall back to opening a drafted email so nothing is lost.
         showToast('No email service configured — opening a draft instead (set one via "configure sender")');
@@ -2505,7 +2505,7 @@
         const res = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ to: item.assignedEmail, subject: `New task assigned: ${item.task}`, body: bodyText, task: item.task, timeFrom: item.timeFrom, timeTo: item.timeTo })
+          body: JSON.stringify({ to: item.assignedEmail, subject: `New task assigned: ${item.task}`, body: bodyText, task: item.task, timeFrom: item.timeFrom, timeTo: item.timeTo, meetingLink: item.meetingLink })
         });
         if (!res.ok) throw new Error('Send failed');
         item.notified = true;
