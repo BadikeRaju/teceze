@@ -3175,82 +3175,49 @@
     }
 
     /* ---- Per-category checklist Excel template / import ---- */
-    function handleChecklistImport(evt, cat) {
-  const file = evt.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-
-  reader.onload = function (e) {
-    try {
-      const data = new Uint8Array(e.target.result);
-      const wb = XLSX.read(data, { type: 'array' });
-
-      // Read ALL sheets
-      let rows = [];
-
-      wb.SheetNames.forEach(sheetName => {
-        const sheet = wb.Sheets[sheetName];
-        if (!sheet) return;
-
-        const sheetRows = XLSX.utils.sheet_to_json(sheet, {
-          defval: ''
-        });
-
-        rows.push(...sheetRows);
-      });
-
-      if (!rows.length) {
-        showToast('No rows found in file');
-        return;
+    function downloadChecklistTemplate(cat) {
+      const items = state.checklist[cat] || [];
+      const wsData = [['Item', 'Done']];
+      if (items.length) {
+        items.forEach(i => wsData.push([i.text, i.done ? 'Yes' : 'No']));
+      } else {
+        wsData.push(['Example: Confirm site access & safety induction completed', 'No']);
       }
-
-      const items = rows.map((r, idx) => {
-        const text = String(
-          r.Item || r.item || r.Task || r.task || ''
-        ).trim();
-
-        const doneRaw = String(
-          r.Done || r.done || ''
-        ).trim().toLowerCase();
-
-        return text
-          ? {
-              id: 'c' + Date.now() + idx,
-              text,
-              done:
-                doneRaw === 'yes' ||
-                doneRaw === 'true' ||
-                doneRaw === '1'
-            }
-          : null;
-      }).filter(Boolean);
-
-      if (!items.length) {
-        showToast(
-          'No valid rows — check column headers (Item, Done)'
-        );
-        return;
-      }
-
-      state.checklist[cat] = items;
-      saveState();
-      renderChecklistModal();
-
-      showToast(
-        `Imported ${items.length} checklist items from all sheets`
-      );
-
-    } catch (err) {
-      console.error(err);
-      showToast('Could not read this file — check the format');
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, cat.slice(0, 31));
+      XLSX.writeFile(wb, `Teceze_Checklist_${cat.replace(/\s+/g, '_')}.xlsx`);
+      showToast('Checklist template downloaded');
     }
-
-    evt.target.value = '';
-  };
-
-  reader.readAsArrayBuffer(file);
-}
+    function handleChecklistImport(evt, cat) {
+      const file = evt.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const wb = XLSX.read(data, { type: 'array' });
+          const sheet = wb.Sheets[wb.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+          if (!rows.length) { showToast('No rows found in file'); return; }
+          const items = rows.map((r, idx) => {
+            const text = String(r.Item || r.item || r.Task || r.task || '').trim();
+            const doneRaw = String(r.Done || r.done || '').trim().toLowerCase();
+            return text ? { id: 'c' + Date.now() + idx, text, done: doneRaw === 'yes' || doneRaw === 'true' || doneRaw === '1' } : null;
+          }).filter(Boolean);
+          if (!items.length) { showToast('No valid rows — check column headers (Item, Done)'); return; }
+          state.checklist[cat] = items;
+          saveState();
+          renderChecklistModal();
+          showToast(`Imported ${items.length} checklist items`);
+        } catch (err) {
+          console.error(err);
+          showToast('Could not read this file — check the format');
+        }
+        evt.target.value = '';
+      };
+      reader.readAsArrayBuffer(file);
+    }
 
     function escapeHtml(str) {
       if (str === undefined || str === null) return '';
