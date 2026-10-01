@@ -2366,7 +2366,7 @@
       const overallPct = pctFor(state.activities);
       const engineers = allEngineers();
 
-      const agendaHtml = state.agenda.map(t => `
+      const agendaHtml = state.agenda.filter(t => !t.done).map(t => `
     <div class="agenda-item">
       <div class="chk ${t.done ? 'done' : ''}" onclick="toggleAgenda('${t.id}')"></div>
       <div class="agenda-text ${t.done ? 'done' : ''}">
@@ -2412,7 +2412,7 @@
 
     <div class="two-col">
       <div class="panel">
-        <div class="panel-head"><h3>📡 Today's agenda</h3><span class="pct">${state.agenda.filter(t => t.done).length}/${state.agenda.length} done</span></div>
+        <div class="panel-head"><h3>📡 Today's agenda</h3><span class="pct">${state.agenda.filter(t => !t.done).length} remaining</span></div>
         ${agendaHtml}
         <div class="mini-form">
           <input type="text" class="task-input" id="newTaskText" placeholder="Add a task to assign...">
@@ -2518,8 +2518,12 @@
       }
     }
     function toggleAgenda(id) {
-      const t = state.agenda.find(x => x.id === id);
-      if (t) { t.done = !t.done; saveState(); render(); }
+      const index = state.agenda.findIndex(t => t.id === id);
+      if (index === -1) return;
+      state.agenda.splice(index, 1);
+      saveState();
+      render();
+      showToast('Meeting completed and removed from agenda');
     }
 
     /* ---- CLIENTS ---- */
